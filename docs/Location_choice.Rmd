@@ -1,0 +1,39 @@
+---
+title: "London location choices"
+author: "George WIllis"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include = FALSE)
+```
+
+```{r}
+devtools::install_github("tlorusso/traveltime")
+
+# load packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(dplyr, purrr, sf, mapview, traveltime)
+
+# how far can you go by public transport within 30 minutes?
+traveltime_Vic <- traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.4952,0.1439),
+               traveltime=1800,
+               type="public_transport",
+               departure="2018-11-15T08:00:00+01:00")
+traveltime_WL <- traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.5032,0.1123),
+               traveltime=1800,
+               type="public_transport",
+               departure="2018-11-15T08:00:00+01:00")
+traveltime_LB <- traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.5043,0.0848),
+               traveltime=1800,
+               type="public_transport",
+               departure="2018-11-15T08:00:00+01:00")
+```
+
