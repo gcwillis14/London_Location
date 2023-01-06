@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(readr)
 library(ggmap)
 ```
 
@@ -73,6 +74,7 @@ traveltimes_LB <-c("walking","cycling","bus","public_transport") %>%
 df_LB<-do.call(rbind.data.frame, traveltimes_LB)
 
 library(ggmap)
+library(leaflet)
 
 #get basemap with ggmap
 basemap <- get_stamenmap(bbox = unname(st_bbox(df_LB)),maptype = "toner-hybrid")
@@ -167,7 +169,12 @@ This finds the common ground between all three locations.
 
 ```{r Overlaps}
 overlap <- st_intersection(traveltime_Vic, traveltime_WL)
-m4 = mapview(overlap,  col.regions = c("green"))
-m4
+#m4 = mapview(overlap,  col.regions = c("green"), alpha.regions = 0.2)
+stations <- read_csv("data/stations.csv")
+stations_sf <- st_as_sf(stations, coords=c("Longitude","Latitude"), crs=4326)
+stations_overlap <- st_intersection(stations_sf, overlap)
+
+mapview(stations_overlap, zcol = "Name", label=("Line"), legend = F) + mapview(overlap, col.regions = c("green"), alpha.regions = 0.2)
+
 ```
 
