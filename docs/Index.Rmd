@@ -168,7 +168,7 @@ ggmap(basemap)+
 This finds the common ground between all three locations.
 
 ```{r Overlaps, echo=F, message=F}
-overlap <- st_intersection(traveltime_Vic, traveltime_WL)
+overlap <- st_union(traveltime_Vic, traveltime_WL)
 #m4 = mapview(overlap,  col.regions = c("green"), alpha.regions = 0.2)
 stations <- read_csv("data/stations.csv")
 stations_sf <- st_as_sf(stations, coords=c("Longitude","Latitude"), crs=4326)
