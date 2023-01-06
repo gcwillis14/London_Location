@@ -174,7 +174,7 @@ stations <- read_csv("data/stations.csv")
 stations_sf <- st_as_sf(stations, coords=c("Longitude","Latitude"), crs=4326)
 stations_overlap <- st_intersection(stations_sf, overlap)
 
-mapview(stations_overlap, zcol = "Name", label=("Line"), legend = F) + mapview(overlap, col.regions = c("green"), alpha.regions = 0.2)
-
+m4 <- mapview(stations_overlap, zcol = "Name", label=("Line"), legend = F) + mapview(overlap, col.regions = c("green"), alpha.regions = 0.2)
+m4
 ```
 
