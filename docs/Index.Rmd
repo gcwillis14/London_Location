@@ -167,7 +167,7 @@ This finds the common ground between all three locations.
 
 ```{r Overlaps}
 overlap <- st_intersection(traveltime_Vic, traveltime_WL)
-m4 = mapview(overlap,  col.regions = c("grey"))
+m4 = mapview(overlap,  col.regions = c("green"))
 m4
 ```
 
