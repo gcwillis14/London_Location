@@ -6,10 +6,10 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(include = FALSE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{r}
+```{r Load data, include=FALSE, echo=FALSE}
 devtools::install_github("tlorusso/traveltime")
 
 # load packages
@@ -19,21 +19,145 @@ pacman::p_load(dplyr, purrr, sf, mapview, traveltime)
 # how far can you go by public transport within 30 minutes?
 traveltime_Vic <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.4952,0.1439),
-               traveltime=1800,
+               location=c(51.49521,-0.143898),
+               traveltime=1500,
                type="public_transport",
-               departure="2018-11-15T08:00:00+01:00")
+               departure="2023-01-15T07:30:00")
 traveltime_WL <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.5032,0.1123),
-               traveltime=1800,
+               location=c(51.5031653,-0.11230509999995775),
+               traveltime=1500,
                type="public_transport",
-               departure="2018-11-15T08:00:00+01:00")
+               departure="2023-01-15T07:30:00")
 traveltime_LB <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.5043,0.0848),
-               traveltime=1800,
+               location=c(51.504573,-0.086054),
+               traveltime=2400,
                type="public_transport",
-               departure="2018-11-15T08:00:00+01:00")
+               departure="2023-01-15T07:30:00")
+
 ```
 
+So clearly, London Bridge in 40 minutes covers pretty much everywhere central. For 25 mins (Waterloo and Victoria), there is far less coverage but still patches of locations, near tube stations. Interestingly Finsbury park and Highbury, most likely the Victoria line.
+
+# Best locations to live based on on work travel times
+
+This is a very basic overview of all travel times for our respective station. For Waterloo and Victoria the time is 25 minutes. For London Bridge I have used 40 minutes. This includes all London transport, so not just tube.
+
+```{r Basic overview, echo=F, message=F}
+m1 = mapview(traveltime_LB,  col.regions = c("grey"))
+m2 = mapview(traveltime_WL,  col.regions = c("pink"))
+m1 + m2 + traveltime_Vic
+```
+
+# Modes of transport
+
+This section will divide the travel time by type of travel for each location. First, London Bridge.
+
+*Note: I can't split overground and underground unfortunately*
+
+```{r LB methods of transport, echo=F, message=F}
+traveltimes_LB <-c("walking","cycling","bus","public_transport") %>%
+  map(.,~traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.504573,-0.086054),
+               traveltime=2400,
+               type=.x,
+               departure="2023-01-15T07:30:00") %>%
+        mutate(mode=.x))
+
+# map_dfr does not work well with sf objects (yet?) so we just..
+
+# ... rbind the dataframes together via do.call
+df_LB<-do.call(rbind.data.frame, traveltimes_LB)
+
+library(ggmap)
+
+#get basemap with ggmap
+basemap <- get_stamenmap(bbox = unname(st_bbox(df_LB)),maptype = "toner-hybrid")
+
+#plot
+ggmap(basemap)+
+  geom_sf(data=df_LB,inherit.aes = FALSE, aes(fill=mode), alpha=0.5,color=NA)+
+  scale_fill_viridis_d()+
+  theme_void()+
+  coord_sf(datum = NA)+
+  facet_wrap(~mode)+
+  guides(fill="none")+
+  theme(plot.title=element_text(face="bold"),
+        plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
+        strip.text=element_text(face="bold",margin=margin(b = 4)))+
+  labs(title="Traveltimemap", subtitle="Times from London Bridge",         caption="data : traveltimeplatform.com")
+```
+
+Now, London Waterloo.
+
+```{r WL methods of transport, echo=F, message=F}
+traveltimes_WL <-c("walking","cycling","bus","public_transport") %>%
+  map(.,~traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.5031653,-0.11230509999995775),
+               traveltime=1500,
+               type=.x,
+               departure="2023-01-15T07:30:00") %>%
+        mutate(mode=.x))
+
+# map_dfr does not work well with sf objects (yet?) so we just..
+
+# ... rbind the dataframes together via do.call
+df_WL<-do.call(rbind.data.frame, traveltimes_WL)
+
+library(ggmap)
+
+#get basemap with ggmap
+basemap <- get_stamenmap(bbox = unname(st_bbox(df_WL)),maptype = "toner-hybrid")
+
+#plot
+ggmap(basemap)+
+  geom_sf(data=df_WL,inherit.aes = FALSE, aes(fill=mode), alpha=0.5,color=NA)+
+  scale_fill_viridis_d()+
+  theme_void()+
+  coord_sf(datum = NA)+
+  facet_wrap(~mode)+
+  guides(fill="none")+
+  theme(plot.title=element_text(face="bold"),
+        plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
+        strip.text=element_text(face="bold",margin=margin(b = 4)))+
+  labs(title="Traveltimemap", subtitle="Times from London Waterloo",         caption="data : traveltimeplatform.com")
+```
+
+And finally London Victoria.
+
+```{r LV methods of transport, echo=F, message=F}
+traveltimes_LV <-c("walking","cycling","bus","public_transport") %>%
+  map(.,~traveltime_map(appId="0ac98a50",
+               apiKey="1a97779905179095dee3c98d35c972d0",
+               location=c(51.49521,-0.143898),
+               traveltime=1500,
+               type=.x,
+               departure="2023-01-15T07:30:00") %>%
+        mutate(mode=.x))
+
+# map_dfr does not work well with sf objects (yet?) so we just..
+
+# ... rbind the dataframes together via do.call
+df_LV<-do.call(rbind.data.frame, traveltimes_LV)
+
+library(ggmap)
+
+#get basemap with ggmap
+basemap <- get_stamenmap(bbox = unname(st_bbox(df_LV)),maptype = "toner-hybrid")
+
+#plot
+ggmap(basemap)+
+  geom_sf(data=df_LV,inherit.aes = FALSE, aes(fill=mode), alpha=0.5,color=NA)+
+  scale_fill_viridis_d()+
+  theme_void()+
+  coord_sf(datum = NA)+
+  facet_wrap(~mode)+
+  guides(fill="none")+
+  theme(plot.title=element_text(face="bold"),
+        plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
+        strip.text=element_text(face="bold",margin=margin(b = 4)))+
+  labs(title="Traveltimemap", subtitle="Times from London Victoria",         caption="data : traveltimeplatform.com")
+```
