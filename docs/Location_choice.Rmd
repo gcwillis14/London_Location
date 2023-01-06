@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(ggmap)
 ```
 
 ```{r Load data, include=FALSE, echo=FALSE}
@@ -38,9 +39,9 @@ traveltime_LB <- traveltime_map(appId="0ac98a50",
 
 ```
 
-So clearly, London Bridge in 40 minutes covers pretty much everywhere central. For 25 mins (Waterloo and Victoria), there is far less coverage but still patches of locations, near tube stations. Interestingly Finsbury park and Highbury, most likely the Victoria line.
+So clearly, London Bridge in 40 minutes covers pretty much everywhere central. For 25 mins (Waterloo and Victoria), there is far less coverage but still patches of locations, near tube stations. Interestingly Finsbury park and Highbury, most likely the Victoria line. Waterloo goes out towards Hoxton and Islington also. Old Kent road is cheap on Monopoly...
 
-# Best locations to live based on on work travel times
+## Best locations to live based on on work travel times
 
 This is a very basic overview of all travel times for our respective station. For Waterloo and Victoria the time is 25 minutes. For London Bridge I have used 40 minutes. This includes all London transport, so not just tube.
 
@@ -50,7 +51,7 @@ m2 = mapview(traveltime_WL,  col.regions = c("pink"))
 m1 + m2 + traveltime_Vic
 ```
 
-# Modes of transport
+## Modes of transport
 
 This section will divide the travel time by type of travel for each location. First, London Bridge.
 
@@ -107,7 +108,6 @@ traveltimes_WL <-c("walking","cycling","bus","public_transport") %>%
 # ... rbind the dataframes together via do.call
 df_WL<-do.call(rbind.data.frame, traveltimes_WL)
 
-library(ggmap)
 
 #get basemap with ggmap
 basemap <- get_stamenmap(bbox = unname(st_bbox(df_WL)),maptype = "toner-hybrid")
@@ -143,7 +143,6 @@ traveltimes_LV <-c("walking","cycling","bus","public_transport") %>%
 # ... rbind the dataframes together via do.call
 df_LV<-do.call(rbind.data.frame, traveltimes_LV)
 
-library(ggmap)
 
 #get basemap with ggmap
 basemap <- get_stamenmap(bbox = unname(st_bbox(df_LV)),maptype = "toner-hybrid")
@@ -161,3 +160,14 @@ ggmap(basemap)+
         strip.text=element_text(face="bold",margin=margin(b = 4)))+
   labs(title="Traveltimemap", subtitle="Times from London Victoria",         caption="data : traveltimeplatform.com")
 ```
+
+## Overlap
+
+This finds the common ground between all three locations.
+
+```{r Overlaps}
+overlap <- st_intersection(traveltime_Vic, traveltime_WL)
+m4 = mapview(overlap,  col.regions = c("grey"))
+m4
+```
+
