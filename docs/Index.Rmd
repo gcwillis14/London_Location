@@ -42,7 +42,7 @@ traveltime_LB <- traveltime_map(appId="0ac98a50",
 
 So clearly, London Bridge in 40 minutes covers pretty much everywhere central. For 25 mins (Waterloo and Victoria), there is far less coverage but still patches of locations, near tube stations. Interestingly Finsbury park and Highbury, most likely the Victoria line. Waterloo goes out towards Hoxton and Islington also. Old Kent road is cheap on Monopoly...
 
-## Best locations to live based on on work travel times
+## Best locations to live based on work travel times
 
 This is a very basic overview of all travel times for our respective station. For Waterloo and Victoria the time is 25 minutes. For London Bridge I have used 40 minutes. This includes all London transport, so not just tube.
 
