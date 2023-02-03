@@ -19,47 +19,46 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(dplyr, purrr, sf, mapview, traveltime)
 
 # how far can you go by public transport within 30 minutes?
-traveltime_Vic <- traveltime_map(appId="0ac98a50",
+traveltime_Tom <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.49521,-0.143898),
-               traveltime=1500,
+               location=c(51.498848,-0.014388),
+               traveltime=2100,
                type="public_transport",
                departure="2023-01-15T07:30:00")
-traveltime_WL <- traveltime_map(appId="0ac98a50",
+traveltime_Elliott <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.5031653,-0.11230509999995775),
-               traveltime=1500,
+               location=c(51.5050744, -0.0897987),
+               traveltime=2100,
                type="public_transport",
                departure="2023-01-15T07:30:00")
-traveltime_LB <- traveltime_map(appId="0ac98a50",
+traveltime_George <- traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
-               location=c(51.504573,-0.086054),
-               traveltime=2400,
+               location=c(51.512381397690866, -0.11643173685673865),
+               traveltime=2100,
                type="public_transport",
                departure="2023-01-15T07:30:00")
 
 ```
-
-So clearly, London Bridge in 40 minutes covers pretty much everywhere central. For 25 mins (Waterloo and Victoria), there is far less coverage but still patches of locations, near tube stations. Interestingly Finsbury park and Highbury, most likely the Victoria line. Waterloo goes out towards Hoxton and Islington also. Old Kent road is cheap on Monopoly...
+All of us for 35 minutes travel time. Pretty clear map actually.
 
 ## Best locations to live based on work travel times
 
-This is a very basic overview of all travel times for our respective station. For Waterloo and Victoria the time is 25 minutes. For London Bridge I have used 40 minutes. This includes all London transport, so not just tube.
+This is a very basic overview of all travel times for our respective station. For our locations the time is 35 minutes..
 
 ```{r Basic overview, echo=F, message=F}
-m1 = mapview(traveltime_LB,  col.regions = c("grey"))
-m2 = mapview(traveltime_WL,  col.regions = c("pink"))
-m1 + m2 + traveltime_Vic
+m1 = mapview(traveltime_Elliott,  col.regions = c("grey"))
+m2 = mapview(traveltime_George,  col.regions = c("pink"))
+m1 + m2 + traveltime_Tom
 ```
 
 ## Modes of transport
 
-This section will divide the travel time by type of travel for each location. First, London Bridge.
+This section will divide the travel time by type of travel for each location. First, Tom.
 
 *Note: I can't split overground and underground unfortunately*
 
 ```{r LB methods of transport, echo=F, message=F}
-traveltimes_LB <-c("walking","cycling","bus","public_transport") %>%
+traveltimes_Tom <-c("walking","cycling","bus","public_transport") %>%
   map(.,~traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
                location=c(51.504573,-0.086054),
@@ -71,7 +70,7 @@ traveltimes_LB <-c("walking","cycling","bus","public_transport") %>%
 # map_dfr does not work well with sf objects (yet?) so we just..
 
 # ... rbind the dataframes together via do.call
-df_LB<-do.call(rbind.data.frame, traveltimes_LB)
+df_LB<-do.call(rbind.data.frame, traveltimes_Tom)
 
 library(ggmap)
 library(leaflet)
@@ -90,13 +89,13 @@ ggmap(basemap)+
   theme(plot.title=element_text(face="bold"),
         plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
         strip.text=element_text(face="bold",margin=margin(b = 4)))+
-  labs(title="Traveltimemap", subtitle="Times from London Bridge",         caption="data : traveltimeplatform.com")
+  labs(title="Traveltimemap", subtitle="Times from Tom",         caption="data : traveltimeplatform.com")
 ```
 
-Now, London Waterloo.
+Now, George.
 
 ```{r WL methods of transport, echo=F, message=F}
-traveltimes_WL <-c("walking","cycling","bus","public_transport") %>%
+traveltimes_George <-c("walking","cycling","bus","public_transport") %>%
   map(.,~traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
                location=c(51.5031653,-0.11230509999995775),
@@ -108,7 +107,7 @@ traveltimes_WL <-c("walking","cycling","bus","public_transport") %>%
 # map_dfr does not work well with sf objects (yet?) so we just..
 
 # ... rbind the dataframes together via do.call
-df_WL<-do.call(rbind.data.frame, traveltimes_WL)
+df_WL<-do.call(rbind.data.frame, traveltimes_George)
 
 
 #get basemap with ggmap
@@ -125,13 +124,13 @@ ggmap(basemap)+
   theme(plot.title=element_text(face="bold"),
         plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
         strip.text=element_text(face="bold",margin=margin(b = 4)))+
-  labs(title="Traveltimemap", subtitle="Times from London Waterloo",         caption="data : traveltimeplatform.com")
+  labs(title="Traveltimemap", subtitle="Times from George",         caption="data : traveltimeplatform.com")
 ```
 
-And finally London Victoria.
+And finally Elliott.
 
 ```{r LV methods of transport, echo=F, message=F}
-traveltimes_LV <-c("walking","cycling","bus","public_transport") %>%
+traveltimes_Elliott <-c("walking","cycling","bus","public_transport") %>%
   map(.,~traveltime_map(appId="0ac98a50",
                apiKey="1a97779905179095dee3c98d35c972d0",
                location=c(51.49521,-0.143898),
@@ -143,7 +142,7 @@ traveltimes_LV <-c("walking","cycling","bus","public_transport") %>%
 # map_dfr does not work well with sf objects (yet?) so we just..
 
 # ... rbind the dataframes together via do.call
-df_LV<-do.call(rbind.data.frame, traveltimes_LV)
+df_LV<-do.call(rbind.data.frame, traveltimes_Elliott)
 
 
 #get basemap with ggmap
@@ -160,7 +159,7 @@ ggmap(basemap)+
   theme(plot.title=element_text(face="bold"),
         plot.subtitle=element_text(size = 10, margin=margin(t=5, b = 10)), 
         strip.text=element_text(face="bold",margin=margin(b = 4)))+
-  labs(title="Traveltimemap", subtitle="Times from London Victoria",         caption="data : traveltimeplatform.com")
+  labs(title="Traveltimemap", subtitle="Times from Elliott",         caption="data : traveltimeplatform.com")
 ```
 
 ## Overlap
@@ -168,7 +167,7 @@ ggmap(basemap)+
 This finds the common ground between all three locations.
 
 ```{r Overlaps, echo=F, message=F}
-overlap <- st_union(traveltime_Vic, traveltime_WL)
+overlap <- st_union(traveltime_Tom, traveltime_Elliott)
 #m4 = mapview(overlap,  col.regions = c("green"), alpha.regions = 0.2)
 stations <- read_csv("data/stations.csv")
 stations_sf <- st_as_sf(stations, coords=c("Longitude","Latitude"), crs=4326)
